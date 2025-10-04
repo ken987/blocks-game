@@ -1,0 +1,12 @@
+# OSの不要ファイル
+.DS_Store
+Thumbs.db
+
+# Node.js関連（将来npmを使う場合）
+node_modules/
+dist/
+build/
+.cache/
+
+# 環境変数ファイル
+.env

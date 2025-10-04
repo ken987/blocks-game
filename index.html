@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブロックス</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>ブロックス</h1>
+
+    <div id="start-game-overlay">
+        <button id="start-game-btn">ゲームスタート</button>
+    </div>
+
+    <div id="settings" class="hidden">
+        <label for="difficulty-select">AIの強さ:</label>
+        <select id="difficulty-select">
+            <option value="easy">かんたん</option>
+            <option value="normal" selected>ふつう</option>
+            <option value="hard">つよい</option>
+        </select>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="main-content">
+            <div id="info-panel">
+                <div id="player-info"></div>
+                <div id="message-area"></div>
+            </div>
+            <div id="game-board"></div>
+        </div>
+        <div id="side-panel">
+            <h2>ピース</h2>
+            <div id="piece-preview"></div>
+            <div id="controls">
+                <button id="rotate-btn">回転</button>
+                <button id="flip-btn">反転</button>
+                <button id="hint-btn">ヒント</button>
+                <button id="pass-btn">パス</button>
+            </div>
+            <div id="piece-palette"></div>
+        </div>
+    </div>
+
+    <div id="game-over-overlay" class="hidden">
+        <div id="game-over-box">
+            <div id="final-message"></div>
+            <button id="restart-btn">もう一度遊ぶ</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

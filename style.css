@@ -1,0 +1,203 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+#game-container {
+    display: flex;
+    gap: 20px;
+}
+
+#main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#info-panel {
+    width: 400px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#player-info {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#message-area {
+    margin-top: 5px;
+    height: 20px;
+    color: #d9534f;
+}
+
+#settings {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#difficulty-select {
+    font-size: 1em;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(20, 20px);
+    grid-template-rows: repeat(20, 20px);
+    width: 400px;
+    height: 400px;
+    border: 2px solid #333;
+    background-color: #ddd;
+}
+
+.cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.cell.preview {
+    opacity: 0.5;
+}
+
+.cell.hint-flash {
+    animation: flash 0.4s 3;
+}
+
+@keyframes flash {
+    50% { background-color: #fffb8c; }
+}
+
+#side-panel {
+    width: 300px;
+}
+
+#piece-preview {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#controls {
+    margin-bottom: 10px;
+}
+
+#controls button {
+    padding: 8px 12px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+#piece-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.piece-container {
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.piece-container.selected {
+    border-color: #007bff;
+}
+
+.piece-grid {
+    display: grid;
+}
+
+.piece-cell {
+    width: 15px;
+    height: 15px;
+}
+
+/* Player Colors */
+.player-0 { background-color: #007bff; } /* Blue */
+.player-1 { background-color: #ffc107; } /* Yellow */
+.player-2 { background-color: #dc3545; } /* Red */
+.player-3 { background-color: #28a745; } /* Green */
+
+.info-0 { background-color: #e7f1ff; color: #004aad; }
+.info-1 { background-color: #fff8e1; color: #ad8600; }
+.info-2 { background-color: #fde8e9; color: #99242e; }
+.info-3 { background-color: #e4f6e9; color: #1c7430; }
+
+/* Game Over Overlay */
+.hidden {
+    display: none !important;
+}
+
+#game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#game-over-box {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+#final-message {
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+#restart-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+#start-game-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+#start-game-btn {
+    font-size: 2em;
+    padding: 20px 40px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #333;
+    background-color: #fff;
+}
+
+#start-game-btn:hover {
+    background-color: #f0f0f0;
+}
