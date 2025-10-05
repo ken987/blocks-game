@@ -1,3 +1,5 @@
+/* 修正箇所 */
+/* bodyにpaddingを追加して、スマホ画面の端に要素がくっつかないようにする */
 body {
     font-family: sans-serif;
     display: flex;
@@ -5,11 +7,16 @@ body {
     align-items: center;
     background-color: #f0f0f0;
     color: #333;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 #game-container {
     display: flex;
     gap: 20px;
+    width: 100%;
+    /* 修正箇所: PCでの最大幅を調整 */
+    max-width: 900px;
 }
 
 #main-content {
@@ -19,13 +26,13 @@ body {
 }
 
 #info-panel {
-    width: 400px;
+    width: 400px; /* 修正箇所: PCでは固定幅に戻す */
     margin-bottom: 10px;
     text-align: center;
 }
 
 #player-info {
-    font-size: 1.5em;
+    font-size: 1.5em; /* 修正箇所: PCでは元のサイズに戻す */
     font-weight: bold;
     padding: 10px;
     border-radius: 5px;
@@ -33,7 +40,7 @@ body {
 
 #message-area {
     margin-top: 5px;
-    height: 20px;
+    height: 20px; /* 修正箇所: PCでは元の高さに戻す */
     color: #d9534f;
 }
 
@@ -52,6 +59,7 @@ body {
 
 #game-board {
     display: grid;
+    /* 修正箇所: PC表示のため固定サイズに戻す */
     grid-template-columns: repeat(20, 20px);
     grid-template-rows: repeat(20, 20px);
     width: 400px;
@@ -61,6 +69,7 @@ body {
 }
 
 .cell {
+    /* 修正箇所: 固定サイズに戻す */
     width: 20px;
     height: 20px;
     border: 1px solid #ccc;
@@ -80,6 +89,7 @@ body {
 }
 
 #side-panel {
+    /* 修正箇所: PCでは固定幅に戻す */
     width: 300px;
 }
 
@@ -98,7 +108,7 @@ body {
 
 #controls button {
     padding: 8px 12px;
-    margin-right: 5px;
+    margin-right: 5px; /* 修正箇所: 元に戻す */
     cursor: pointer;
 }
 
@@ -106,6 +116,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    /* 修正箇所: PCでの高さを元に戻す */
     max-height: 400px;
     overflow-y: auto;
 }
@@ -124,9 +135,78 @@ body {
 }
 
 .piece-cell {
+    /* 修正箇所: PC表示のため固定サイズに戻す */
     width: 15px;
     height: 15px;
 }
+
+/* 修正箇所: レスポンシブ対応 */
+@media (max-width: 768px) {
+    #game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #main-content {
+        order: 1; /* 表示順序を上にする */
+        width: 100%;
+    }
+
+    #info-panel {
+        width: 100%;
+    }
+
+    #player-info {
+        font-size: 1.2em;
+    }
+
+    #message-area {
+        height: 40px; /* メッセージが改行されても見えるように高さを増やす */
+    }
+
+    /* 修正箇所: スマホ表示の時だけ可変にする */
+    #game-board {
+        grid-template-columns: repeat(20, 4.5vw);
+        grid-template-rows: repeat(20, 4.5vw);
+        width: 90vw;
+        height: 90vw;
+    }
+
+    .cell {
+        /* gridの定義で決まるためwidth, heightは不要 */
+        width: auto;
+        height: auto;
+    }
+
+    #side-panel {
+        order: 2; /* 表示順序を下にする */
+        width: 100%;
+        max-width: 400px; /* ボードの最大幅に合わせる */
+    }
+
+    #controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    #controls button {
+        margin-right: 0;
+    }
+
+    #piece-palette {
+        max-height: 200px; /* スマホでの高さを調整 */
+        justify-content: center;
+    }
+
+    /* 修正箇所: スマホ表示の時だけ可変にする */
+    .piece-cell {
+        width: 3vw;
+        height: 3vw;
+    }
+}
+
 
 /* Player Colors */
 .player-0 { background-color: #007bff; } /* Blue */
