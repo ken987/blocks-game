@@ -281,3 +281,10 @@ body {
 #start-game-btn:hover {
     background-color: #f0f0f0;
 }
+
+#version {
+    font-size: 0.8rem;
+    color: #666;
+    margin: -10px 0 10px;
+    text-align: center;
+}
