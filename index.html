@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロックス</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1>ブロックス</h1>
-    <p id="version">v1.0.1</p>
+    <p id="version">v1.0.3</p>
 
     <div id="start-game-overlay">
         <button id="start-game-btn">ゲームスタート</button>
@@ -29,18 +31,33 @@
                 <div id="player-info"></div>
                 <div id="message-area"></div>
             </div>
-            <div id="game-board"></div>
-        </div>
-        <div id="side-panel">
-            <h2>ピース</h2>
-            <div id="piece-preview"></div>
-            <div id="controls">
-                <button id="rotate-btn">回転</button>
-                <button id="flip-btn">反転</button>
-                <button id="hint-btn">ヒント</button>
-                <button id="pass-btn">パス</button>
+
+            <!-- ここを置き換え -->
+            <div id="board-wrap">
+                <div id="game-board"></div>
             </div>
-            <div id="piece-palette"></div>
+        </div>
+
+        <div id="side-panel">
+            <div id="side-panel">
+                <!-- 追加: ズームコントロール -->
+                <div id="zoom-ctrl">
+                    <label>ズーム：
+                        <input id="zoom-range" type="range" min="80" max="200" value="100">
+                    </label>
+                </div>
+
+                <h2>ピース</h2>
+                <div id="piece-preview"></div>
+                <div id="controls">
+                    <button id="rotate-btn">回転</button>
+                    <button id="flip-btn">反転</button>
+                    <button id="hint-btn">ヒント</button>
+                    <button id="pass-btn">パス</button>
+                </div>
+                <div id="piece-palette"></div>
+            </div>
+
         </div>
     </div>
 
@@ -53,4 +70,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

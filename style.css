@@ -1,5 +1,20 @@
 /* 修正箇所 */
 /* bodyにpaddingを追加して、スマホ画面の端に要素がくっつかないようにする */
+
+:root {
+  /* PC既定（今の見た目そのまま） */
+  --cell: 20px;        /* 盤面セル */
+  --piece-cell: 15px;  /* ピース一覧セル */
+}
+
+/* モバイルは端末幅に応じて拡大/縮小。最小/最大をクランプ */
+@media (max-width: 768px) {
+  :root {
+    --cell: clamp(16px, 4.8vw, 28px);
+    --piece-cell: clamp(12px, 3.6vw, 22px);
+  }
+}
+
 body {
     font-family: sans-serif;
     display: flex;
@@ -10,6 +25,7 @@ body {
     padding: 0 10px;
     box-sizing: border-box;
 }
+
 
 #game-container {
     display: flex;
@@ -59,25 +75,24 @@ body {
 
 #game-board {
     display: grid;
-    /* 修正箇所: PC表示のため固定サイズに戻す */
-    grid-template-columns: repeat(20, 20px);
-    grid-template-rows: repeat(20, 20px);
-    width: 400px;
-    height: 400px;
+    grid-template-columns: repeat(20, var(--cell));
+    grid-template-rows: repeat(20, var(--cell));
+    width: calc(var(--cell) * 20);
+    height: calc(var(--cell) * 20);
     border: 2px solid #333;
     background-color: #ddd;
 }
 
 .cell {
-    /* 修正箇所: 固定サイズに戻す */
-    width: 20px;
-    height: 20px;
+    width: var(--cell);
+    height: var(--cell);
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
 
-.cell.preview {
-    opacity: 0.5;
+.piece-cell {
+    width: var(--piece-cell);
+    height: var(--piece-cell);
 }
 
 .cell.hint-flash {
@@ -288,3 +303,20 @@ body {
     margin: -10px 0 10px;
     text-align: center;
 }
+
+#board-wrap {
+  touch-action: none;          /* ピンチ/パンの誤作動を防ぐ */
+  transform-origin: top left;  /* 左上を基準に拡大縮小 */
+}
+
+#zoom-ctrl {
+  margin: 6px 0 12px;
+}
+
+#zoom-ctrl input[type="range"] {
+  width: 100%;
+  block-size: 24px; /* 触りやすく */
+}
+
+/* 無効プレビュー色（任意、見やすさUP） */
+.cell.preview.invalid { background-color: #888; opacity: .45; }

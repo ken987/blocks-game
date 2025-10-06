@@ -27,18 +27,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOverOverlay = document.getElementById('game-over-overlay');
     const finalMessageEl = document.getElementById('final-message');
     const restartBtn = document.getElementById('restart-btn');
+    const boardWrap = document.getElementById('board-wrap');
+    const zoomRange = document.getElementById('zoom-range');
+
 
     // Game State
     let board, pieces, playerState, currentPlayerIndex, selectedPiece, passCounter, isGameOver, gameDifficulty;
+    let zoom = 1;
+    let lastPinchDist = null;
+
 
     function main() {
-    // alert("test"); ← 削除
+        // alert("test"); ← 削除
 
-    // 代わりに setTimeout を使う
-    setTimeout(() => {
-        startGameBtn.addEventListener('click', startGame);
-        restartBtn.addEventListener('click', init);
-    }, 100); // 100ms 後に実行（必要なら時間は調整）
+        // 代わりに setTimeout を使う
+        setTimeout(() => {
+            startGameBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', init);
+        }, 100); // 100ms 後に実行（必要なら時間は調整）
     }
 
 
@@ -84,7 +90,40 @@ document.addEventListener('DOMContentLoaded', () => {
         boardEl.addEventListener('mouseover', handleBoardHover);
         boardEl.addEventListener('mouseout', handleBoardMouseOut);
         boardEl.addEventListener('click', handleBoardClick);
+
+        // === ここから追加：ズーム ===
+        if (zoomRange) {
+            zoomRange.addEventListener('input', () => {
+                zoom = parseInt(zoomRange.value, 10) / 100;
+                boardWrap.style.transform = `scale(${zoom})`;
+            });
+        }
+
+        // ピンチズーム（2本指）
+        if (boardWrap) {
+            boardWrap.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault(); // ページスクロール抑止
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const dist = Math.hypot(dx, dy);
+                    if (lastPinchDist != null) {
+                        const ratio = dist / lastPinchDist;
+                        zoom = Math.min(2.0, Math.max(0.8, zoom * ratio)); // 80%～200%
+                        boardWrap.style.transform = `scale(${zoom})`;
+                        if (zoomRange) zoomRange.value = Math.round(zoom * 100);
+                    }
+                    lastPinchDist = dist;
+                }
+            }, { passive: false });
+
+            boardWrap.addEventListener('touchend', () => {
+                lastPinchDist = null;
+            });
+        }
+        // === 追加ここまで ===
     }
+
 
     function handleTurn() {
         if (isGameOver) return;
@@ -210,8 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const corners = new Set();
         for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) {
             if (board[r][c] === player.id) {
-                [[r-1,c-1],[r-1,c+1],[r+1,c-1],[r+1,c+1]].forEach(([nr,nc]) => {
-                    if(isValidPlacement([[1]], nr, nc, player)) corners.add(`${nr},${nc}`);
+                [[r - 1, c - 1], [r - 1, c + 1], [r + 1, c - 1], [r + 1, c + 1]].forEach(([nr, nc]) => {
+                    if (isValidPlacement([[1]], nr, nc, player)) corners.add(`${nr},${nc}`);
                 });
             }
         }
@@ -234,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const move = findNormalMove(playerState[currentPlayerIndex]); // Give 'normal' level hints
         if (move) {
             const pieceEl = piecePaletteEl.querySelector(`[data-piece-name='${move.pieceName}']`);
-            if(pieceEl) selectPiece(move.pieceName, pieces[move.pieceName], playerState[currentPlayerIndex].id, pieceEl);
+            if (pieceEl) selectPiece(move.pieceName, pieces[move.pieceName], playerState[currentPlayerIndex].id, pieceEl);
             selectedPiece.shape = move.shape;
             renderPreview();
             for (let r = 0; r < move.shape.length; r++) for (let c = 0; c < move.shape[r].length; c++) if (move.shape[r][c]) {
@@ -253,16 +292,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderBoard() { for (let r = 0; r < BOARD_SIZE; r++) for (let c = 0; c < BOARD_SIZE; c++) { const cell = boardEl.querySelector(`[data-r='${r}'][data-c='${c}']`); cell.className = 'cell'; if (board[r][c] !== null) cell.classList.add(PLAYERS[board[r][c]].color); } }
     function renderPlayerInfo() { const player = playerState[currentPlayerIndex]; playerInfoEl.textContent = `${player.name}のターン`; playerInfoEl.className = `info-${player.id}`; }
     function renderPiecePalette() { piecePaletteEl.innerHTML = ''; const player = playerState[currentPlayerIndex]; if (player.type !== 'human') return; player.pieces.forEach(pieceName => { const pieceShape = pieces[pieceName]; const pieceContainer = createPieceElement(pieceName, pieceShape, player.id); pieceContainer.addEventListener('click', () => selectPiece(pieceName, pieceShape, player.id, pieceContainer)); piecePaletteEl.appendChild(pieceContainer); }); }
-    function createPieceElement(name, shape, playerId) { const container = document.createElement('div'); container.classList.add('piece-container'); container.dataset.pieceName = name; const grid = document.createElement('div'); grid.classList.add('piece-grid');
-    /* 修正箇所: インラインスタイルを削除してCSSでサイズを管理する */
-    grid.style.gridTemplateRows = `repeat(${shape.length}, 1fr)`;
-    grid.style.gridTemplateColumns = `repeat(${shape[0].length}, 1fr)`;
-    for (let r = 0; r < shape.length; r++) for (let c = 0; c < shape[r].length; c++) { const cell = document.createElement('div'); cell.classList.add('piece-cell'); if (shape[r][c]) cell.classList.add(PLAYERS[playerId].color); grid.appendChild(cell); } container.appendChild(grid); return container; }
+    function createPieceElement(name, shape, playerId) {
+        const container = document.createElement('div'); container.classList.add('piece-container'); container.dataset.pieceName = name; const grid = document.createElement('div'); grid.classList.add('piece-grid');
+        /* 修正箇所: インラインスタイルを削除してCSSでサイズを管理する */
+        grid.style.gridTemplateRows = `repeat(${shape.length}, 1fr)`;
+        grid.style.gridTemplateColumns = `repeat(${shape[0].length}, 1fr)`;
+        for (let r = 0; r < shape.length; r++) for (let c = 0; c < shape[r].length; c++) { const cell = document.createElement('div'); cell.classList.add('piece-cell'); if (shape[r][c]) cell.classList.add(PLAYERS[playerId].color); grid.appendChild(cell); } container.appendChild(grid); return container;
+    }
     function renderPreview() { piecePreviewEl.innerHTML = ''; if (selectedPiece) { const pieceEl = createPieceElement(selectedPiece.name, selectedPiece.shape, selectedPiece.player); piecePreviewEl.appendChild(pieceEl); } }
     function handleBoardHover(e) { if (!selectedPiece || !e.target.classList.contains('cell')) return; clearPreviews(); const r = parseInt(e.target.dataset.r, 10), c = parseInt(e.target.dataset.c, 10); const { shape } = selectedPiece; const isValid = isValidPlacement(shape, r, c, playerState[currentPlayerIndex]); for (let i = 0; i < shape.length; i++) for (let j = 0; j < shape[i].length; j++) if (shape[i][j]) { const boardCell = boardEl.querySelector(`[data-r='${r + i}'][data-c='${c + j}']`); if (boardCell) boardCell.classList.add('preview', isValid ? PLAYERS[currentPlayerIndex].color : 'player-2'); } }
     function handleBoardMouseOut(e) { clearPreviews(); }
     function clearPreviews() { document.querySelectorAll('.cell.preview').forEach(cell => { cell.classList.remove('preview', 'player-0', 'player-1', 'player-2', 'player-3'); const r = parseInt(cell.dataset.r, 10), c = parseInt(cell.dataset.c, 10); if (board[r][c] !== null) cell.classList.add(PLAYERS[board[r][c]].color); }); }
-    function isValidPlacement(shape, startR, startC, player) { let touchesCorner = false, touchesEdge = false; for (let r = 0; r < shape.length; r++) for (let c = 0; c < shape[r].length; c++) if (shape[r][c]) { const boardR = startR + r, boardC = startC + c; if (boardR < 0 || boardR >= BOARD_SIZE || boardC < 0 || boardC >= BOARD_SIZE || board[boardR][boardC] !== null) return false; if (player.isFirstMove) { if (boardR === player.corner.r && boardC === player.corner.c) touchesCorner = true; } else { [[boardR - 1, boardC], [boardR + 1, boardC], [boardR, boardC - 1], [boardR, boardC + 1]].forEach(([nr, nc]) => { if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player.id) touchesEdge = true; }); [[boardR - 1, boardC - 1], [boardR - 1, boardC + 1], [boardR + 1, boardC - 1], [boardR + 1, boardC + 1]].forEach(([nr, nc]) => { if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player.id) touchesCorner = true; }); } } if (player.isFirstMove) return touchesCorner; return touchesCorner && !touchesEdge; }
+    function isValidPlacement(shape, startR, startC, player) { let touchesCorner = false, touchesEdge = false; for (let r = 0; r < shape.length; r++) for (let c = 0; c < shape[r].length; c++) if (shape[r][c]) { const boardR = startR + r, boardC = startC + c; if (boardR < 0 || boardR >= BOARD_SIZE || boardC < 0 || boardC >= BOARD_SIZE || board[boardR][boardC] !== null) return false; if (player.isFirstMove) { if (boardR === player.corner.r && boardC === player.corner.c) touchesCorner = true; } else { [[boardR - 1, boardC], [boardR + 1, boardC], [boardR, boardC - 1], [boardR, boardC + 1]].forEach(([nr, nc]) => { if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player.id) touchesEdge = true; });[[boardR - 1, boardC - 1], [boardR - 1, boardC + 1], [boardR + 1, boardC - 1], [boardR + 1, boardC + 1]].forEach(([nr, nc]) => { if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player.id) touchesCorner = true; }); } } if (player.isFirstMove) return touchesCorner; return touchesCorner && !touchesEdge; }
     function rotateMatrix(matrix) { const rows = matrix.length, cols = matrix[0].length; const newMatrix = Array(cols).fill(null).map(() => Array(rows).fill(0)); for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) newMatrix[c][rows - 1 - r] = matrix[r][c]; return newMatrix; }
     function flipMatrix(matrix) { return matrix.map(row => row.slice().reverse()); }
 
